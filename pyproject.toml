@@ -6,7 +6,7 @@ authors = ["altescy <altescy@fastmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "3.8"
+python = ">=3.8,<3.9"
 numpy = "^1.22.3"
 scipy = "^1.8.0"
 scikit-learn = "^1.0.2"

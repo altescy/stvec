@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: {}
+
+jobs:
+  tests:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Set up Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+
+    - name: Run test for rust
+      run: make rust-test
+
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies for Python
+      run: |
+        python -m pip install --upgrade pip
+        pip install poetry
+        poetry install
+        make clean
+
+    - name: Set up python with Maturin
+      run: make python-setup
+
+    - name: Lint with pysen
+      run: make python-lint
+
+    - name: Test with pytest
+      run: make python-test
