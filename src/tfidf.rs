@@ -25,7 +25,7 @@ fn vectorize(
                 let weight = if use_idf {
                     log_total_docs - (*df as f64).ln_1p() + 1.0
                 } else {
-                    *df as f64
+                    1.0
                 };
                 count
                     .entry(*index)
@@ -87,5 +87,25 @@ impl TfidfVectorizer {
             use_idf: use_idf,
             vocabulary: Vocabulary::from_params(vocab_params),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_vectorize() {
+        let docs = vec![
+            String::from("foo bar bar baz"),
+            String::from("foo foo baz qux"),
+        ];
+        let mut vocab = Vocabulary::new(0, 100);
+        vocab.train(&docs);
+
+        let (row, col, dat) = vectorize(&docs, &vocab, false);
+        assert_eq!(row.len(), 6);
+        assert_eq!(col.len(), 6);
+        assert_eq!(dat.len(), 6);
     }
 }
