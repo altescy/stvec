@@ -4,7 +4,7 @@ from scipy import sparse
 from sklearn.base import TransformerMixin
 from sklearn.preprocessing import normalize
 
-from .stvec import TfidfVectorizer as _TfidfVectorizer  # noqa F401
+from .stvec import TfidfVectorizer as _TfidfVectorizer
 
 
 class TfidfVectorizer(TransformerMixin):  # type: ignore[misc]
