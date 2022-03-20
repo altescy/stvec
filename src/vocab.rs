@@ -7,6 +7,8 @@ pub struct Vocabulary {
     tokens: HashMap<String, (usize, usize)>,
 }
 
+pub type VocabularyParams = (usize, usize, usize, Vec<(String, usize, usize)>);
+
 impl Vocabulary {
     pub fn new(min_df: usize, max_df: usize) -> Self {
         Vocabulary {
@@ -54,7 +56,7 @@ impl Vocabulary {
         self.total_docs
     }
 
-    pub fn to_params(&self) -> (usize, usize, usize, Vec<(String, usize, usize)>) {
+    pub fn to_params(&self) -> VocabularyParams {
         (
             self.min_df,
             self.max_df,
@@ -66,7 +68,7 @@ impl Vocabulary {
         )
     }
 
-    pub fn from_params(params: (usize, usize, usize, Vec<(String, usize, usize)>)) -> Self {
+    pub fn from_params(params: VocabularyParams) -> Self {
         let (min_df, max_df, total_docs, tokens) = params;
         Vocabulary {
             min_df: min_df,

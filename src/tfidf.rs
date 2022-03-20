@@ -1,4 +1,4 @@
-use super::vocab::Vocabulary;
+use super::vocab::{Vocabulary, VocabularyParams};
 use hashbrown::HashMap;
 use numpy::PyArray1;
 use pyo3::prelude::*;
@@ -8,6 +8,8 @@ pub struct TfidfVectorizer {
     use_idf: bool,
     vocabulary: Vocabulary,
 }
+
+pub type TfidfVectorizerParams = (bool, VocabularyParams);
 
 fn vectorize(
     texts: &Vec<String>,
@@ -76,12 +78,12 @@ impl TfidfVectorizer {
         (row, col, dat)
     }
 
-    fn to_params(&self) -> (bool, (usize, usize, usize, Vec<(String, usize, usize)>)) {
+    fn to_params(&self) -> TfidfVectorizerParams {
         (self.use_idf, self.vocabulary.to_params())
     }
 
     #[staticmethod]
-    fn from_params(params: (bool, (usize, usize, usize, Vec<(String, usize, usize)>))) -> Self {
+    fn from_params(params: TfidfVectorizerParams) -> Self {
         let (use_idf, vocab_params) = params;
         TfidfVectorizer {
             use_idf: use_idf,
