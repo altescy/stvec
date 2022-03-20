@@ -32,7 +32,7 @@ fn vectorize(
                 count
                     .entry(*index)
                     .and_modify(|value| *value += weight)
-                    .or_insert(1.0);
+                    .or_insert(weight);
             }
         }
         for (index, value) in count.into_iter() {
