@@ -241,6 +241,7 @@ checksum = "a378727d5fdcaafd15b5afe9842cff1c25fdc43f62a162ffda2263c57ad98703"
 dependencies = [
  "anyhow",
  "cfg-if 1.0.0",
+ "hashbrown",
  "indoc",
  "libc",
  "parking_lot",
