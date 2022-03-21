@@ -51,7 +51,7 @@ impl TfidfVectorizer {
     fn __new__(min_df: usize, max_df: usize, use_idf: bool) -> Self {
         TfidfVectorizer {
             use_idf: use_idf,
-            vocabulary: Vocabulary::new(min_df, max_df),
+            vocabulary: Vocabulary::new(min_df, max_df, false),
         }
     }
 
@@ -103,7 +103,7 @@ mod tests {
             String::from("foo bar bar baz"),
             String::from("foo foo baz qux"),
         ];
-        let mut vocab = Vocabulary::new(0, 100);
+        let mut vocab = Vocabulary::new(0, 100, false);
         vocab.train(&docs);
 
         let (row, col, dat) = vectorize(&docs, &vocab, false);

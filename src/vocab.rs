@@ -1,20 +1,27 @@
 use super::tokenizer::tokenize;
 use hashbrown::HashMap;
 
+const BOS: &'static str = "@@BOS@@";
+const EOS: &'static str = "@@EOS@@";
+const PAD: &'static str = "@@PAD@@";
+const UNK: &'static str = "@@UNK@@";
+
 pub struct Vocabulary {
     min_df: usize,
     max_df: usize,
+    use_specials: bool,
     total_docs: usize,
     tokens: HashMap<String, (usize, usize)>,
 }
 
-pub type VocabularyParams = (usize, usize, usize, Vec<(String, usize, usize)>);
+pub type VocabularyParams = (usize, usize, bool, usize, Vec<(String, usize, usize)>);
 
 impl Vocabulary {
-    pub fn new(min_df: usize, max_df: usize) -> Self {
+    pub fn new(min_df: usize, max_df: usize, use_specials: bool) -> Self {
         Vocabulary {
             min_df: min_df,
             max_df: max_df,
+            use_specials: use_specials,
             total_docs: 0,
             tokens: HashMap::new(),
         }
@@ -40,7 +47,17 @@ impl Vocabulary {
                     .or_insert((d, 1usize));
             }
         }
-        let mut index: usize = 0;
+        if self.use_specials {
+            self.tokens
+                .insert(String::from(BOS), (self.tokens.len(), 0));
+            self.tokens
+                .insert(String::from(EOS), (self.tokens.len(), 0));
+            self.tokens
+                .insert(String::from(PAD), (self.tokens.len(), 0));
+            self.tokens
+                .insert(String::from(UNK), (self.tokens.len(), 0));
+        }
+        let mut index: usize = self.tokens.len();
         for (&token, &(_, df)) in dfs.iter() {
             if self.min_df <= df && df <= self.max_df {
                 self.tokens.insert(String::from(token), (index, df));
@@ -53,6 +70,22 @@ impl Vocabulary {
         self.tokens.get(token)
     }
 
+    pub fn bos(&self) -> Option<usize> {
+        self.tokens.get(BOS).map(|(index, _)| *index)
+    }
+
+    pub fn eos(&self) -> Option<usize> {
+        self.tokens.get(EOS).map(|(index, _)| *index)
+    }
+
+    pub fn pad(&self) -> Option<usize> {
+        self.tokens.get(PAD).map(|(index, _)| *index)
+    }
+
+    pub fn unk(&self) -> Option<usize> {
+        self.tokens.get(UNK).map(|(index, _)| *index)
+    }
+
     pub fn total_docs(&self) -> usize {
         self.total_docs
     }
@@ -61,6 +94,7 @@ impl Vocabulary {
         (
             self.min_df,
             self.max_df,
+            self.use_specials,
             self.total_docs,
             self.tokens
                 .iter()
@@ -70,10 +104,11 @@ impl Vocabulary {
     }
 
     pub fn from_params(params: VocabularyParams) -> Self {
-        let (min_df, max_df, total_docs, tokens) = params;
+        let (min_df, max_df, use_specials, total_docs, tokens) = params;
         Vocabulary {
             min_df: min_df,
             max_df: max_df,
+            use_specials: use_specials,
             total_docs: total_docs,
             tokens: tokens
                 .iter()
@@ -94,7 +129,7 @@ mod tests {
             String::from("this is a second sentence"),
         ];
 
-        let mut vocab = Vocabulary::new(0, 10);
+        let mut vocab = Vocabulary::new(0, 10, false);
         vocab.train(&texts);
         assert_eq!(vocab.get("this").unwrap().1, 2);
         assert_eq!(vocab.get("first").unwrap().1, 1);
