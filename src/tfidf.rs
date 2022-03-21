@@ -1,3 +1,4 @@
+use super::tokenizer::tokenize;
 use super::vocab::{Vocabulary, VocabularyParams};
 use hashbrown::HashMap;
 use numpy::PyArray1;
@@ -22,7 +23,7 @@ fn vectorize(
     let log_total_docs = (vocab.total_docs() as f64).ln_1p();
     for i in 0..texts.len() {
         let mut count: HashMap<usize, f64> = HashMap::new();
-        for token in texts[i].trim().split_whitespace() {
+        for token in tokenize(&texts[i]) {
             if let Some((index, df)) = vocab.get(token) {
                 let weight = if use_idf {
                     log_total_docs - (*df as f64).ln_1p() + 1.0

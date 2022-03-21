@@ -1,3 +1,4 @@
+use super::tokenizer::tokenize;
 use hashbrown::HashMap;
 
 pub struct Vocabulary {
@@ -28,7 +29,7 @@ impl Vocabulary {
         self.total_docs = docs.len();
         let mut dfs = HashMap::new();
         for d in 0..docs.len() {
-            for token in docs[d].trim().split_whitespace() {
+            for token in tokenize(&docs[d]) {
                 dfs.entry(token)
                     .and_modify(|(prev, df)| {
                         if *prev != d {
