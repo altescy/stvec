@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, Union, cast
+from typing import List, Optional, Set, Tuple, Union, cast
 
 import numpy
 
@@ -10,9 +10,11 @@ class Indexer:
         self,
         min_df: Union[int, float] = 1,
         max_df: Union[int, float] = 1.0,
+        stop_words: Optional[Set[str]] = None,
     ) -> None:
         self.min_df = min_df
         self.max_df = max_df
+        self.stop_words = stop_words or set()
         self._indexer: Optional[_Indexer] = None
 
     def _get_indexer(self) -> _Indexer:
@@ -36,7 +38,7 @@ class Indexer:
         num_docs = len(docs)
         min_df = int(self.min_df if isinstance(self.min_df, int) else self.min_df * num_docs)
         max_df = int(self.max_df if isinstance(self.max_df, int) else self.max_df * num_docs)
-        self._indexer = _Indexer(min_df, max_df)
+        self._indexer = _Indexer(min_df, max_df, self.stop_words)
         self._indexer.train(docs)
 
     def vectorize(self, docs: List[str]) -> Tuple[numpy.ndarray, numpy.ndarray]:

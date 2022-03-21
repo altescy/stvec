@@ -1,5 +1,6 @@
 use super::vocab::Vocabulary;
 use anyhow::Result;
+use hashbrown::HashSet;
 use numpy::PyArray2;
 use pyo3::prelude::*;
 
@@ -11,9 +12,9 @@ pub struct Indexer {
 #[pymethods]
 impl Indexer {
     #[new]
-    fn __new__(min_df: usize, max_df: usize) -> Self {
+    fn __new__(min_df: usize, max_df: usize, stop_words: HashSet<String>) -> Self {
         Indexer {
-            vocabulary: Vocabulary::new(min_df, max_df, true),
+            vocabulary: Vocabulary::new(min_df, max_df, true, stop_words),
         }
     }
 

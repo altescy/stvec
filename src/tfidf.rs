@@ -1,6 +1,6 @@
 use super::tokenizer::tokenize;
 use super::vocab::{Vocabulary, VocabularyParams};
-use hashbrown::HashMap;
+use hashbrown::{HashMap, HashSet};
 use numpy::PyArray1;
 use pyo3::prelude::*;
 
@@ -48,10 +48,10 @@ fn vectorize(
 #[pymethods]
 impl TfidfVectorizer {
     #[new]
-    fn __new__(min_df: usize, max_df: usize, use_idf: bool) -> Self {
+    fn __new__(min_df: usize, max_df: usize, use_idf: bool, stop_words: HashSet<String>) -> Self {
         TfidfVectorizer {
             use_idf: use_idf,
-            vocabulary: Vocabulary::new(min_df, max_df, false),
+            vocabulary: Vocabulary::new(min_df, max_df, false, stop_words),
         }
     }
 
@@ -103,7 +103,7 @@ mod tests {
             String::from("foo bar bar baz"),
             String::from("foo foo baz qux"),
         ];
-        let mut vocab = Vocabulary::new(0, 100, false);
+        let mut vocab = Vocabulary::new(0, 100, false, HashSet::new());
         vocab.train(&docs);
 
         let (row, col, dat) = vectorize(&docs, &vocab, false);

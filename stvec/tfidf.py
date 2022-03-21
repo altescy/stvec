@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Set, Union
 
 from scipy import sparse
 from sklearn.base import TransformerMixin
@@ -14,12 +14,14 @@ class TfidfVectorizer(TransformerMixin):  # type: ignore[misc]
         max_df: Union[int, float] = 1.0,
         use_idf: bool = True,
         norm: Literal["l1", "l2", None] = "l2",
+        stop_words: Optional[Set[str]] = None,
     ) -> None:
         super().__init__()
         self.min_df = min_df
         self.max_df = max_df
         self.use_idf = use_idf
         self.norm = norm
+        self.stop_words = stop_words or set()
         self._vectorizer: Optional[_TfidfVectorizer] = None
 
     def _get_vectorizer(self) -> _TfidfVectorizer:
@@ -35,7 +37,7 @@ class TfidfVectorizer(TransformerMixin):  # type: ignore[misc]
         num_docs = len(docs)
         min_df = int(self.min_df if isinstance(self.min_df, int) else num_docs * self.min_df)
         max_df = int(self.max_df if isinstance(self.max_df, int) else num_docs * self.max_df)
-        self._vectorizer = _TfidfVectorizer(min_df, max_df, self.use_idf)
+        self._vectorizer = _TfidfVectorizer(min_df, max_df, self.use_idf, self.stop_words)
         self._vectorizer.train(docs)
         return self
 
