@@ -1,3 +1,4 @@
+use super::tokenizer::tokenize;
 use super::vocab::{Vocabulary, VocabularyParams};
 use anyhow::Result;
 use hashbrown::HashSet;
@@ -53,7 +54,7 @@ impl Indexer {
             mask.push(vec![]);
             indices.push(vec![]);
             let mut length = 0;
-            for token in docs[d].trim().split_whitespace() {
+            for token in tokenize(&docs[d]) {
                 length += 1;
                 mask[d].push(true);
                 if let Some((index, _)) = self.vocabulary.get(token) {
