@@ -84,7 +84,11 @@ impl Vocabulary {
     }
 
     pub fn get(&self, token: &str) -> Option<&(usize, usize)> {
-        self.tokens.get(token)
+        if self.stop_words.contains(token) {
+            None
+        } else {
+            self.tokens.get(token)
+        }
     }
 
     pub fn bos(&self) -> Option<usize> {
