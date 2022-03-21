@@ -49,13 +49,16 @@ impl Indexer {
         let mut max_length: usize = 0;
         let mut indices: Vec<Vec<usize>> = vec![];
         let mut mask: Vec<Vec<bool>> = vec![];
+        let bos_index = self.bos();
+        let eos_index = self.eos();
         let unk_index = self.unk();
+        let pad_index = self.pad();
         for d in 0..docs.len() {
             mask.push(vec![]);
             indices.push(vec![]);
-            let mut length = 0;
+            mask[d].push(true);
+            indices[d].push(bos_index);
             for token in tokenize(&docs[d]) {
-                length += 1;
                 mask[d].push(true);
                 if let Some((index, _)) = self.vocabulary.get(token) {
                     indices[d].push(*index);
@@ -63,11 +66,13 @@ impl Indexer {
                     indices[d].push(unk_index);
                 }
             }
+            mask[d].push(true);
+            indices[d].push(eos_index);
+            let length = indices[0].len();
             if length > max_length {
                 max_length = length;
             }
         }
-        let pad_index = self.pad();
         for d in 0..docs.len() {
             let diff = max_length - indices[d].len();
             for _ in 0..diff {
