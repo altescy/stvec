@@ -1,4 +1,4 @@
-use super::vocab::Vocabulary;
+use super::vocab::{Vocabulary, VocabularyParams};
 use anyhow::Result;
 use hashbrown::HashSet;
 use numpy::PyArray2;
@@ -8,6 +8,8 @@ use pyo3::prelude::*;
 pub struct Indexer {
     vocabulary: Vocabulary,
 }
+
+type IndexerParams = VocabularyParams;
 
 #[pymethods]
 impl Indexer {
@@ -75,5 +77,17 @@ impl Indexer {
         let indices = PyArray2::from_vec2(py, &indices)?;
         let mask = PyArray2::from_vec2(py, &mask)?;
         Ok((indices, mask))
+    }
+
+    fn to_params(&self) -> IndexerParams {
+        self.vocabulary.to_params()
+    }
+
+    #[staticmethod]
+    fn from_params(params: IndexerParams) -> Indexer {
+        let vocab_params = params;
+        Indexer {
+            vocabulary: Vocabulary::from_params(vocab_params),
+        }
     }
 }

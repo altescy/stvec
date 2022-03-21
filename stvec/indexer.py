@@ -1,4 +1,4 @@
-from typing import List, Optional, Set, Tuple, Union, cast
+from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
 
 import numpy
 
@@ -44,3 +44,20 @@ class Indexer:
     def vectorize(self, docs: List[str]) -> Tuple[numpy.ndarray, numpy.ndarray]:
         output, mask = self._get_indexer().vectorize(docs)
         return cast(numpy.ndarray, output), cast(numpy.ndarray, mask)
+
+    def __getstate__(self) -> Dict[str, Any]:
+        state = {
+            "min_df": self.min_df,
+            "max_df": self.max_df,
+            "stop_words": self.stop_words,
+        }
+        if self._indexer is not None:
+            state["indexer"] = self._indexer.to_params()
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        self.min_df = state["min_df"]
+        self.max_df = state["max_df"]
+        self.stop_words = state["stop_words"]
+        if "indexer" in state:
+            self._indexer = _Indexer.from_params(state["indexer"])
